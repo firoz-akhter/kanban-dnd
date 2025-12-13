@@ -16,6 +16,7 @@ import Column from "./Column";
 
 function Board() {
   // hm bhi column ko as object he rkhenge
+  console.log("testing branch switch");
   const [items, setItems] = useState({
     group1: ["1", "2", "3"],
     group2: ["4", "5", "6"],
