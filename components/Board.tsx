@@ -1,28 +1,39 @@
 "use client";
 
 import React, { useState } from "react";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
 import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
   useSensors,
+  useSensor,
+  PointerSensor,
+  KeyboardSensor,
+  DndContext,
+  closestCorners,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverEvent,
+  DragOverlay,
+  DropAnimation,
+  defaultDropAnimation,
 } from "@dnd-kit/core";
-import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-
-// import { arrayMove } from "./utils/array";
-import { arrayMove, insertAtIndex, removeAtIndex } from "../utils/array";
+import { sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
+import { INITIAL_TASKS } from "../data";
+import { BoardSections as BoardSectionsType } from "../types";
+import { getTaskById } from "../utils/tasks";
+import { findBoardSectionContainer, initializeBoard } from "../utils/board";
+// import BoardSection from "./BoardSection";
+// import TaskItem from "./TaskItem";
 import Column from "./Column";
+import Task from "./Task";
 
-function Board() {
-  // hm bhi column ko as object he rkhenge
-  console.log("testing branch switch");
-  const [items, setItems] = useState({
-    group1: ["1", "2", "3"],
-    group2: ["4", "5", "6"],
-    group3: ["7", "8", "9"],
-  });
-  // console.log(items);
+const Board = () => {
+  const tasks = INITIAL_TASKS;
+  const initialBoardSections = initializeBoard(INITIAL_TASKS);
+  const [boardSections, setBoardSections] =
+    useState<BoardSectionsType>(initialBoardSections);
+
+  const [activeTaskId, setActiveTaskId] = useState<null | string>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -31,105 +42,129 @@ function Board() {
     })
   );
 
-  const handleDragOver = ({ over, active }) => {
-    const overId = over?.id;
-
-    if (!overId) {
-      return;
-    }
-
-    const activeContainer = active.data.current.sortable.containerId;
-    const overContainer = over.data.current?.sortable.containerId;
-
-    if (!overContainer) {
-      return;
-    }
-
-    if (activeContainer !== overContainer) {
-      setItems((items) => {
-        const activeIndex = active.data.current.sortable.index;
-        const overIndex = over.data.current?.sortable.index || 0;
-
-        return moveBetweenContainers(
-          items,
-          activeContainer,
-          activeIndex,
-          overContainer,
-          overIndex,
-          active.id
-        );
-      });
-    }
+  const handleDragStart = ({ active }: DragStartEvent) => {
+    setActiveTaskId(active.id as string);
   };
 
-  const handleDragEnd = ({ active, over }) => {
-    if (!over) {
+  const handleDragOver = ({ active, over }: DragOverEvent) => {
+    // Find the containers
+    const activeContainer = findBoardSectionContainer(
+      boardSections,
+      active.id as string
+    );
+    const overContainer = findBoardSectionContainer(
+      boardSections,
+      over?.id as string
+    );
+
+    if (
+      !activeContainer ||
+      !overContainer ||
+      activeContainer === overContainer
+    ) {
       return;
     }
 
-    if (active.id !== over.id) {
-      const activeContainer = active.data.current.sortable.containerId;
-      const overContainer = over.data.current?.sortable.containerId || over.id;
-      const activeIndex = active.data.current.sortable.index;
-      const overIndex = over.data.current?.sortable.index || 0;
+    setBoardSections((boardSection) => {
+      const activeItems = boardSection[activeContainer];
+      const overItems = boardSection[overContainer];
 
-      setItems((items) => {
-        let newItems;
-        if (activeContainer === overContainer) {
-          newItems = {
-            ...items,
-            [overContainer]: arrayMove(
-              items[overContainer],
-              activeIndex,
-              overIndex
-            ),
-          };
-        } else {
-          newItems = moveBetweenContainers(
-            items,
-            activeContainer,
-            activeIndex,
-            overContainer,
+      // Find the indexes for the items
+      const activeIndex = activeItems.findIndex(
+        (item) => item.id === active.id
+      );
+      const overIndex = overItems.findIndex((item) => item.id !== over?.id);
+
+      return {
+        ...boardSection,
+        [activeContainer]: [
+          ...boardSection[activeContainer].filter(
+            (item) => item.id !== active.id
+          ),
+        ],
+        [overContainer]: [
+          ...boardSection[overContainer].slice(0, overIndex),
+          boardSections[activeContainer][activeIndex],
+          ...boardSection[overContainer].slice(
             overIndex,
-            active.id
-          );
-        }
+            boardSection[overContainer].length
+          ),
+        ],
+      };
+    });
+  };
 
-        return newItems;
-      });
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    const activeContainer = findBoardSectionContainer(
+      boardSections,
+      active.id as string
+    );
+    const overContainer = findBoardSectionContainer(
+      boardSections,
+      over?.id as string
+    );
+
+    if (
+      !activeContainer ||
+      !overContainer ||
+      activeContainer !== overContainer
+    ) {
+      return;
     }
+
+    const activeIndex = boardSections[activeContainer].findIndex(
+      (task) => task.id === active.id
+    );
+    const overIndex = boardSections[overContainer].findIndex(
+      (task) => task.id === over?.id
+    );
+
+    if (activeIndex !== overIndex) {
+      setBoardSections((boardSection) => ({
+        ...boardSection,
+        [overContainer]: arrayMove(
+          boardSection[overContainer],
+          activeIndex,
+          overIndex
+        ),
+      }));
+    }
+
+    setActiveTaskId(null);
   };
 
-  const moveBetweenContainers = (
-    items,
-    activeContainer,
-    activeIndex,
-    overContainer,
-    overIndex,
-    item
-  ) => {
-    return {
-      ...items,
-      [activeContainer]: removeAtIndex(items[activeContainer], activeIndex),
-      [overContainer]: insertAtIndex(items[overContainer], overIndex, item),
-    };
+  const dropAnimation: DropAnimation = {
+    ...defaultDropAnimation,
   };
 
-  const containerStyle = { display: "flex" };
+  const task = activeTaskId ? getTaskById(tasks, activeTaskId) : null;
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragEnd={handleDragEnd}
-      onDragOver={handleDragOver}
-    >
-      <div style={containerStyle}>
-        {Object.keys(items).map((group) => (
-          <Column id={group} items={items[group]} key={group} />
-        ))}
-      </div>
-    </DndContext>
+    <Container>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <Grid container spacing={4}>
+          {Object.keys(boardSections).map((boardSectionKey) => (
+            <Grid item xs={4} key={boardSectionKey}>
+              <Column
+                id={boardSectionKey}
+                title={boardSectionKey}
+                tasks={boardSections[boardSectionKey]}
+              />
+            </Grid>
+          ))}
+          <DragOverlay dropAnimation={dropAnimation}>
+            {task ? <Task task={task} /> : null}
+          </DragOverlay>
+        </Grid>
+      </DndContext>
+    </Container>
   );
-}
+};
 
 export default Board;
