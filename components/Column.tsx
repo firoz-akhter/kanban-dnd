@@ -1,28 +1,47 @@
-// @ts-ignore
-import { useDroppable } from "@dnd-kit/core";
-import { rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import React from "react";
+import Box from "@mui/material/Box";
+import { useDroppable } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import Typography from "@mui/material/Typography";
+import { Task } from "../types";
 import Task from "./Task";
+import SortableTaskItem from "./SortableTaskItem";
 
-const Column = ({ id, items }) => {
-  const { setNodeRef } = useDroppable({ id });
+type BoardSectionProps = {
+  id: string;
+  title: string;
+  tasks: Task[];
+};
 
-  const droppableStyle = {
-    padding: "20px 10px",
-    border: "1px solid black",
-    borderRadius: "5px",
-    minWidth: 110,
-  };
+const Column = ({ id, title, tasks }: BoardSectionProps) => {
+  const { setNodeRef } = useDroppable({
+    id,
+  });
 
   return (
-    <SortableContext id={id} items={items} strategy={rectSortingStrategy}>
-      <div ref={setNodeRef} style={droppableStyle}>
-        {/* <h2>{id}</h2> */}
-        {items.map((item) => (
-          <Task key={item} id={item} />
-        ))}
-      </div>
-    </SortableContext>
+    <Box sx={{ backgroundColor: "#eee", padding: 2 }}>
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        {title}
+      </Typography>
+      <SortableContext
+        id={id}
+        items={tasks}
+        strategy={verticalListSortingStrategy}
+      >
+        <div ref={setNodeRef}>
+          {tasks.map((task) => (
+            <Box key={task.id} sx={{ mb: 2 }}>
+              <SortableTaskItem id={task.id}>
+                <Task task={task} />
+              </SortableTaskItem>
+            </Box>
+          ))}
+        </div>
+      </SortableContext>
+    </Box>
   );
 };
 

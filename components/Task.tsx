@@ -1,31 +1,15 @@
-import React from "react";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { Card, CardContent } from "@mui/material";
+import { Task } from "../types";
 
-const Task = (props) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: props.id });
+type TaskItemProps = {
+  task: Task;
+};
 
-  const itemStyle = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    width: 110,
-    height: 30,
-    display: "flex",
-    alignItems: "center",
-    paddingLeft: 5,
-    border: "1px solid gray",
-    borderRadius: 5,
-    marginBottom: 5,
-    userSelect: "none",
-    cursor: "grab",
-    boxSizing: "border-box",
-  };
-
+const Task = ({ task }: TaskItemProps) => {
   return (
-    <div style={itemStyle} ref={setNodeRef} {...attributes} {...listeners}>
-      Item {props.id}
-    </div>
+    <Card>
+      <CardContent>{task.title}</CardContent>
+    </Card>
   );
 };
 
