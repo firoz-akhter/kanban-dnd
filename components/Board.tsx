@@ -18,14 +18,13 @@ import {
   defaultDropAnimation,
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
-import { INITIAL_TASKS } from "../data";
-import { BoardSections as BoardSectionsType } from "../types";
+import { INITIAL_TASKS } from "../data/index";
+import { BoardSections as BoardSectionsType } from "../types/index";
 import { getTaskById } from "../utils/tasks";
 import { findBoardSectionContainer, initializeBoard } from "../utils/board";
 // import BoardSection from "./BoardSection";
-// import TaskItem from "./TaskItem";
 import Column from "./Column";
-import Task from "./Task";
+import TaskItem from "./TaskItem";
 
 const Board = () => {
   const tasks = INITIAL_TASKS;
@@ -159,7 +158,7 @@ const Board = () => {
             </Grid>
           ))}
           <DragOverlay dropAnimation={dropAnimation}>
-            {task ? <Task task={task} /> : null}
+            {task ? <TaskItem task={task} /> : null}
           </DragOverlay>
         </Grid>
       </DndContext>
