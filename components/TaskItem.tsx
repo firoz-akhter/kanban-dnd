@@ -5,7 +5,8 @@ type TaskItemProps = {
   task: Task;
 };
 
-const Task = ({ task }: TaskItemProps) => {
+const TaskItem = ({ task }: TaskItemProps) => {
+  console.log("checking branch changes");
   return (
     <Card>
       <CardContent>{task.title}</CardContent>
@@ -13,4 +14,4 @@ const Task = ({ task }: TaskItemProps) => {
   );
 };
 
-export default Task;
+export default TaskItem;

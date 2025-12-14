@@ -6,8 +6,8 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import Typography from "@mui/material/Typography";
-import { Task } from "../types";
-import Task from "./Task";
+import { Task } from "../types/index";
+import TaskItem from "./TaskItem";
 import SortableTaskItem from "./SortableTaskItem";
 
 type BoardSectionProps = {
@@ -35,7 +35,7 @@ const Column = ({ id, title, tasks }: BoardSectionProps) => {
           {tasks.map((task) => (
             <Box key={task.id} sx={{ mb: 2 }}>
               <SortableTaskItem id={task.id}>
-                <Task task={task} />
+                <TaskItem task={task} />
               </SortableTaskItem>
             </Box>
           ))}
