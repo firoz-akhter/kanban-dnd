@@ -38,3 +38,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 <!-- todo -->
 <!-- we will do getBoardColumn  -->
 <!-- boardData = {[{id: "", columnName: "", todos: []}, {...}, {...}]} -->
+<!-- we have to make updateTask on drag end -->
+<!-- both cases dnd in the same column & diff column -->

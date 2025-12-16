@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import Box from "@mui/material/Box";
 import { useDroppable } from "@dnd-kit/core";
 import {
@@ -25,6 +25,7 @@ import {
   TextField,
 } from "@mui/material";
 import toast from "react-hot-toast";
+import { stat } from "fs";
 
 type BoardSectionProps = {
   id: string;
@@ -62,6 +63,18 @@ BoardSectionProps) => {
   const [newTask, setNewTask] = useState(initialNewTask);
   console.log("newTask", newTask);
   console.log("columnId,,.", columnId);
+
+  const [isUpdateTaskOpen, setIsUpdateTaskOpen] = useState(false);
+  const [updateTask, setUpdateTask] = useState({
+    title: "",
+    status: "",
+    description: "",
+    priority: "",
+    dueDate: "",
+    columnName: "",
+  });
+
+  // console.log("updateTask", updateTask);
 
   console.log("column props", id, title, tasks);
   console.log("id from column", id);
@@ -116,6 +129,50 @@ BoardSectionProps) => {
     }
   };
 
+  const handleUpdateTask = async () => {
+    if (!updateTask.title.trim()) {
+      toast.error("Task title is required");
+      return;
+    }
+
+    const toastId = toast.loading("Updating task...");
+
+    try {
+      const payload = {
+        title: updateTask.title,
+        description: updateTask.description,
+        priority: updateTask.priority,
+        dueDate: updateTask.dueDate,
+        status: updateTask.status,
+        // newColumnName: task.columnName, // ✅ IMPORTANT
+      };
+
+      const response = await fetch(
+        `${baseUrl}/updateTask/${updateTask._id}/${updateTask.columnId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to update task");
+      }
+
+      toast.success("Task updated successfully", { id: toastId });
+
+      setIsUpdateTaskOpen(false);
+      fetchData();
+    } catch (error: any) {
+      toast.error(error.message || "Error updating task", { id: toastId });
+    }
+  };
+
   return (
     <>
       <Box sx={{ backgroundColor: "#eee", padding: 2 }}>
@@ -131,7 +188,12 @@ BoardSectionProps) => {
             {tasks.map((task) => (
               <Box key={task._id} sx={{ mb: 2 }}>
                 <SortableTaskItem id={task._id}>
-                  <TaskItem task={task} />
+                  <TaskItem
+                    task={task}
+                    fetchData={fetchData}
+                    setIsUpdateTaskOpen={setIsUpdateTaskOpen}
+                    setUpdateTask={setUpdateTask}
+                  />
                 </SortableTaskItem>
               </Box>
             ))}
@@ -225,6 +287,84 @@ BoardSectionProps) => {
           <Button onClick={() => setIsAddTaskOpen(false)}>Cancel</Button>
           <Button onClick={handleAddTask} variant="contained">
             Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Update Task Popup */}
+      <Dialog
+        open={isUpdateTaskOpen}
+        onClose={() => setIsUpdateTaskOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Update Task</DialogTitle>
+
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+        >
+          {/* Task Title */}
+          <TextField
+            required
+            autoFocus
+            fullWidth
+            label="Task Title"
+            value={updateTask.title}
+            onChange={(e) =>
+              setUpdateTask((prev) => ({ ...prev, title: e.target.value }))
+            }
+          />
+
+          {/* Description */}
+          <TextField
+            required
+            fullWidth
+            label="Description"
+            multiline
+            rows={3}
+            value={updateTask.description}
+            onChange={(e) =>
+              setUpdateTask((prev) => ({
+                ...prev,
+                description: e.target.value,
+              }))
+            }
+          />
+
+          {/* Priority */}
+          <FormControl fullWidth required>
+            <InputLabel>Priority</InputLabel>
+            <Select
+              value={updateTask.priority}
+              label="Priority"
+              onChange={(e) =>
+                setUpdateTask((prev) => ({ ...prev, priority: e.target.value }))
+              }
+            >
+              <MenuItem value="low">Low</MenuItem>
+              <MenuItem value="medium">Medium</MenuItem>
+              <MenuItem value="high">High</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Due Date */}
+          <TextField
+            required
+            fullWidth
+            label="Due Date"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={updateTask.dueDate}
+            onChange={(e) =>
+              setUpdateTask((prev) => ({ ...prev, dueDate: e.target.value }))
+            }
+          />
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setIsUpdateTaskOpen(false)}>Cancel</Button>
+          <Button onClick={handleUpdateTask} variant="contained">
+            Update
           </Button>
         </DialogActions>
       </Dialog>
