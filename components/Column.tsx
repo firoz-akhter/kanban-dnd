@@ -21,6 +21,9 @@ const Column = ({ id, title, tasks }: BoardSectionProps) => {
     id,
   });
 
+  console.log("column props", id, title, tasks);
+  console.log("id from column", id);
+
   return (
     <Box sx={{ backgroundColor: "#eee", padding: 2 }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
@@ -33,8 +36,8 @@ const Column = ({ id, title, tasks }: BoardSectionProps) => {
       >
         <div ref={setNodeRef}>
           {tasks.map((task) => (
-            <Box key={task.id} sx={{ mb: 2 }}>
-              <SortableTaskItem id={task.id}>
+            <Box key={task._id} sx={{ mb: 2 }}>
+              <SortableTaskItem id={task._id}>
                 <TaskItem task={task} />
               </SortableTaskItem>
             </Box>
