@@ -1,4 +1,5 @@
-export type Status = "backlog" | "in progress" | "done";
+// export type Status = "backlog" | "in progress" | "done";
+export type Status = string;
 
 export type Task = {
   id: string;

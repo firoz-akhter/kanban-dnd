@@ -2,10 +2,26 @@ import { BoardSections, Status, Task } from "../types";
 import { BOARD_SECTIONS } from "../constants";
 import { getTasksByStatus } from "./tasks";
 
-export const initializeBoard = (tasks: Task[]) => {
+export const OldInitializeBoard = (tasks: Task[]) => {
   const boardSections: BoardSections = {};
 
   Object.keys(BOARD_SECTIONS).forEach((boardSectionKey) => {
+    boardSections[boardSectionKey] = getTasksByStatus(
+      tasks,
+      boardSectionKey as Status
+    );
+  });
+
+  return boardSections;
+};
+
+export const initializeBoard = (tasks: Task[]) => {
+  const boardSections = {};
+
+  tasks.forEach((task) => (boardSections[task?.columnName] = []));
+  // console.log("dummy boardSections", boardSections);
+
+  Object.keys(boardSections).forEach((boardSectionKey) => {
     boardSections[boardSectionKey] = getTasksByStatus(
       tasks,
       boardSectionKey as Status
@@ -19,12 +35,13 @@ export const findBoardSectionContainer = (
   boardSections: BoardSections,
   id: string
 ) => {
+  // console.log("id and boardSections", id, boardSections);
   if (id in boardSections) {
     return id;
   }
 
   const container = Object.keys(boardSections).find((key) =>
-    boardSections[key].find((item) => item.id === id)
+    boardSections[key].find((item) => item._id === id)
   );
   return container;
 };

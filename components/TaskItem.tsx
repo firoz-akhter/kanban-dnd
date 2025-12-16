@@ -6,7 +6,6 @@ type TaskItemProps = {
 };
 
 const TaskItem = ({ task }: TaskItemProps) => {
-  console.log("checking branch changes");
   return (
     <Card>
       <CardContent>{task.title}</CardContent>
