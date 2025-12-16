@@ -36,6 +36,7 @@ const Board = () => {
   // const oldInitialBoardSections = OldInitializeBoard(INITIAL_TASKS);
 
   const [boardColumns, setBoardColumns] = useState([]);
+  console.log("boardColumns,,", boardColumns);
   const [tasks, setTasks] = useState([]);
 
   // this is obj of columns with todos: [] in it boardSections = boardColumns
@@ -67,25 +68,25 @@ const Board = () => {
     }
   };
 
+  const fetchData = async () => {
+    try {
+      const data = await getBoardColumns();
+      console.log("data,,,", data);
+      setBoardColumns(data.data);
+      // we will setTasks
+      const fetchedTasks = [];
+      data.data.forEach((column) => fetchedTasks.push(...column.todos));
+      console.log("fetched tasks", fetchedTasks);
+      setTasks(fetchedTasks);
+
+      const initialBoardSections = initializeBoard(fetchedTasks);
+      setBoardSections(initialBoardSections);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getBoardColumns();
-        console.log("data,,,", data);
-        setBoardColumns(data.data);
-        // we will setTasks
-        const fetchedTasks = [];
-        data.data.forEach((column) => fetchedTasks.push(...column.todos));
-        console.log("fetched tasks", fetchedTasks);
-        setTasks(fetchedTasks);
-
-        const initialBoardSections = initializeBoard(fetchedTasks);
-        setBoardSections(initialBoardSections);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     fetchData();
   }, []);
 
@@ -106,6 +107,7 @@ const Board = () => {
 
   const handleDragOver = ({ active, over }: DragOverEvent) => {
     // Find the containers
+    // return;
     console.log("handleDragOver", active, over);
     const activeContainer = findBoardSectionContainer(
       boardSections,
@@ -116,7 +118,11 @@ const Board = () => {
       over?.id as string
     );
 
-    // console.log("active and over container", activeContainer, overContainer);
+    console.log(
+      "active and over container handleDragOver",
+      activeContainer,
+      overContainer
+    );
 
     if (
       !activeContainer ||
@@ -156,6 +162,7 @@ const Board = () => {
   };
 
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    // console.log("inside handleDragEnd");
     const activeContainer = findBoardSectionContainer(
       boardSections,
       active.id as string
@@ -216,12 +223,14 @@ const Board = () => {
         onDragEnd={handleDragEnd}
       >
         <Grid container spacing={4}>
-          {Object.keys(boardSections).map((boardSectionKey) => (
+          {Object.keys(boardSections).map((boardSectionKey, idx) => (
             <Grid item xs={4} key={boardSectionKey}>
               <Column
                 id={boardSectionKey}
                 title={boardSectionKey}
                 tasks={boardSections[boardSectionKey]}
+                columnId={boardColumns[idx]._id}
+                fetchData={fetchData}
               />
             </Grid>
           ))}
