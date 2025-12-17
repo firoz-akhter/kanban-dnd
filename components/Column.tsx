@@ -52,11 +52,11 @@ BoardSectionProps) => {
 
   const initialNewTask = {
     title: "",
-    status: tasks[0]?.columnName || "",
+    status: title || "",
     description: "",
     priority: "",
     dueDate: "",
-    ColumnName: tasks[0]?.columnName || "",
+    ColumnName: title || "",
   };
 
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
@@ -82,6 +82,9 @@ BoardSectionProps) => {
   const baseUrl = "http://localhost:4000/api";
 
   const handleAddTask = async () => {
+    // console.log("newTask", newTask);
+    // console.log(columnId);
+    // return;
     if (!newTask.title.trim()) {
       toast.error("Task title can't be empty");
       return;

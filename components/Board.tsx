@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
+import AddIcon from "@mui/icons-material/Add";
 import {
   useSensors,
   useSensor,
@@ -29,6 +30,17 @@ import {
 // import BoardSection from "./BoardSection";
 import Column from "./Column";
 import TaskItem from "./TaskItem";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Typography,
+} from "@mui/material";
+import toast from "react-hot-toast";
 
 const Board = () => {
   // const oldTasks = INITIAL_TASKS;
@@ -38,10 +50,12 @@ const Board = () => {
   const [boardColumns, setBoardColumns] = useState([]);
   console.log("boardColumns,,", boardColumns);
   const [tasks, setTasks] = useState([]);
+  const [isAddColumnOpen, setIsAddColumnOpen] = useState(false);
+  const [newColumn, setNewColumn] = useState({ columnName: "" });
 
   // this is obj of columns with todos: [] in it boardSections = boardColumns
   const [boardSections, setBoardSections] = useState<BoardSectionsType>({});
-  // console.log("boardSections,,", boardSections);
+  console.log("boardSections,,", boardSections);
 
   // console.log("tasks...", tasks);
   // console.log(boardColumns);
@@ -79,7 +93,7 @@ const Board = () => {
       console.log("fetched tasks", fetchedTasks);
       setTasks(fetchedTasks);
 
-      const initialBoardSections = initializeBoard(fetchedTasks);
+      const initialBoardSections = initializeBoard(fetchedTasks, data.data);
       setBoardSections(initialBoardSections);
     } catch (error) {
       console.error(error);
@@ -99,6 +113,52 @@ const Board = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const handleAddColumn = async () => {
+    if (!newColumn.columnName.trim()) {
+      toast.error("Task title can't be empty");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${baseUrl}/addColumn/69317058536abc4e80038c55`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            columnName: newColumn.columnName,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to add new list");
+      }
+
+      console.log("List Added:", result.data);
+
+      // add toaster
+      toast.success("List created successfully🎉..");
+
+      // ✅ Close dialog
+      setIsAddColumnOpen(false);
+
+      // ✅ Reset form
+      // setNewTask(initialNewTask);
+
+      fetchData();
+
+      // 🔥 Optional: refresh column / dispatch redux
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message);
+    }
+  };
 
   const handleDragStart = ({ active }: DragStartEvent) => {
     console.log("handleDragStart", active);
@@ -214,32 +274,89 @@ const Board = () => {
   console.log("boardColumns", boardColumns);
 
   return (
-    <Container>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
-        <Grid container spacing={4}>
-          {Object.keys(boardSections).map((boardSectionKey, idx) => (
-            <Grid item xs={4} key={boardSectionKey}>
-              <Column
-                id={boardSectionKey}
-                title={boardSectionKey}
-                tasks={boardSections[boardSectionKey]}
-                columnId={boardColumns[idx]._id}
-                fetchData={fetchData}
-              />
+    <>
+      <Container>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+        >
+          <Grid container spacing={4}>
+            {/* <div className="flex gap-8 justify-center"> */}
+            {Object.keys(boardSections).map((boardSectionKey, idx) => (
+              <Grid item xs={3} key={boardSectionKey}>
+                <Column
+                  id={boardSectionKey}
+                  title={boardSectionKey}
+                  tasks={boardSections[boardSectionKey]}
+                  columnId={boardColumns[idx]._id}
+                  // columnName={}
+                  fetchData={fetchData}
+                />
+              </Grid>
+            ))}
+            <Grid item xs={3} key="">
+              <Box sx={{ backgroundColor: "#eee", padding: 2 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  <Button
+                    onClick={() => setIsAddColumnOpen(true)}
+                    variant="text"
+                    startIcon={<AddIcon />}
+                    sx={{
+                      mt: 4,
+                      borderRadius: "12px",
+                      textTransform: "none",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Add New Task List
+                  </Button>
+                </Typography>
+              </Box>
             </Grid>
-          ))}
-          <DragOverlay dropAnimation={dropAnimation}>
-            {task ? <TaskItem task={task} /> : null}
-          </DragOverlay>
-        </Grid>
-      </DndContext>
-    </Container>
+            {/* </div> */}
+            <DragOverlay dropAnimation={dropAnimation}>
+              {task ? <TaskItem task={task} /> : null}
+            </DragOverlay>
+          </Grid>
+        </DndContext>
+      </Container>
+
+      {/* Add Task Popup */}
+      <Dialog
+        open={isAddColumnOpen}
+        onClose={() => setIsAddColumnOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Add New Column</DialogTitle>
+
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+        >
+          {/* Task Title */}
+          <TextField
+            required
+            autoFocus
+            fullWidth
+            label="Task Title"
+            value={newColumn.columnName}
+            onChange={(e) =>
+              setNewColumn((prev) => ({ ...prev, columnName: e.target.value }))
+            }
+          />
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setIsAddColumnOpen(false)}>Cancel</Button>
+          <Button onClick={handleAddColumn} variant="contained">
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
