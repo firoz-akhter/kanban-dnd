@@ -8,6 +8,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import Typography from "@mui/material/Typography";
+import CloseIcon from "@mui/icons-material/Close";
 import { Task } from "../types/index";
 import TaskItem from "./TaskItem";
 import SortableTaskItem from "./SortableTaskItem";
@@ -19,13 +20,16 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import toast from "react-hot-toast";
 import { stat } from "fs";
+import { relative } from "path";
 
 type BoardSectionProps = {
   id: string;
@@ -73,6 +77,8 @@ BoardSectionProps) => {
     dueDate: "",
     columnName: "",
   });
+
+  const [isDeleteColumn, setIsDeleteColumn] = useState(false);
 
   // console.log("updateTask", updateTask);
 
@@ -176,9 +182,61 @@ BoardSectionProps) => {
     }
   };
 
+  const handleDeleteColumn = async () => {
+    try {
+      let boardId = "69317058536abc4e80038c55";
+      const response = await fetch(
+        `${baseUrl}/deleteColumn/${columnId}/${boardId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Failed to delete column");
+        return;
+      }
+
+      console.log("Column deleted:", data);
+      toast.success("List Deleted Successfully ✅");
+      setIsDeleteColumn(false);
+
+      // Refresh board data
+      fetchData(); // or refetchBoard()
+    } catch (error) {
+      console.error("Error deleting column:", error);
+      toast.error(error.message || "Error updating task", { id: toastId });
+    }
+  };
+
   return (
     <>
-      <Box sx={{ backgroundColor: "#eee", padding: 2 }}>
+      <Box sx={{ backgroundColor: "#eee", padding: 2, position: "relative" }}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: 6,
+            right: 6,
+            display: "flex",
+            gap: 0.5,
+            zIndex: 10,
+          }}
+        >
+          <Tooltip title="Delete Column">
+            <IconButton
+              size="small"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => setIsDeleteColumn(true)}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
         <Typography variant="h6" sx={{ mb: 2 }}>
           {title}
         </Typography>
@@ -368,6 +426,29 @@ BoardSectionProps) => {
           <Button onClick={() => setIsUpdateTaskOpen(false)}>Cancel</Button>
           <Button onClick={handleUpdateTask} variant="contained">
             Update
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* delete column popup */}
+      <Dialog
+        open={isDeleteColumn}
+        onClose={() => setIsDeleteColumn(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{`Are you sure to delete "${title}" column`}</DialogTitle>
+
+        <DialogActions>
+          <Button onClick={() => setIsDeleteColumn(false)} color="inherit">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteColumn}
+            variant="contained"
+            color="error"
+          >
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

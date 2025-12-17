@@ -120,19 +120,18 @@ const Board = () => {
       return;
     }
 
+    let boardId = "69317058536abc4e80038c55";
+
     try {
-      const response = await fetch(
-        `${baseUrl}/addColumn/69317058536abc4e80038c55`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            columnName: newColumn.columnName,
-          }),
-        }
-      );
+      const response = await fetch(`${baseUrl}/addColumn/${boardId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          columnName: newColumn.columnName,
+        }),
+      });
 
       const result = await response.json();
 
@@ -283,10 +282,26 @@ const Board = () => {
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
-          <Grid container spacing={4}>
+          {/* <Grid container spacing={4}> */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              minHeight: "calc(100vh - 200px)",
+              pb: 2,
+            }}
+          >
             {/* <div className="flex gap-8 justify-center"> */}
             {Object.keys(boardSections).map((boardSectionKey, idx) => (
-              <Grid item xs={3} key={boardSectionKey}>
+              // <Grid item xs={3} key={boardSectionKey}>
+              <Box
+                key={boardSectionKey}
+                sx={{
+                  minWidth: 300,
+                  maxWidth: 300,
+                  flexShrink: 0,
+                }}
+              >
                 <Column
                   id={boardSectionKey}
                   title={boardSectionKey}
@@ -295,32 +310,44 @@ const Board = () => {
                   // columnName={}
                   fetchData={fetchData}
                 />
-              </Grid>
-            ))}
-            <Grid item xs={3} key="">
-              <Box sx={{ backgroundColor: "#eee", padding: 2 }}>
-                <Typography variant="h6" sx={{ mb: 2 }}>
-                  <Button
-                    onClick={() => setIsAddColumnOpen(true)}
-                    variant="text"
-                    startIcon={<AddIcon />}
-                    sx={{
-                      mt: 4,
-                      borderRadius: "12px",
-                      textTransform: "none",
-                      fontWeight: 600,
-                    }}
-                  >
-                    Add New Task List
-                  </Button>
-                </Typography>
+                {/* </Grid> */}
               </Box>
-            </Grid>
+              // minor changes
+            ))}
+            {/* <Grid item xs={3} key=""> */}
+            <Box
+              sx={{
+                minWidth: 300,
+                maxWidth: 300,
+                flexShrink: 0,
+                marginRight: 20,
+              }}
+            >
+              <Box sx={{ backgroundColor: "#eee", padding: 2, marginRight: 2 }}>
+                {/* <Typography variant="h6" sx={{ mb: 2 }}> */}
+                <Button
+                  onClick={() => setIsAddColumnOpen(true)}
+                  variant="text"
+                  startIcon={<AddIcon />}
+                  sx={{
+                    mt: 4,
+                    borderRadius: "12px",
+                    textTransform: "none",
+                    fontWeight: 600,
+                  }}
+                >
+                  Add New Task List
+                </Button>
+                {/* </Typography> */}
+              </Box>
+              {/* </Grid> */}
+            </Box>
             {/* </div> */}
             <DragOverlay dropAnimation={dropAnimation}>
               {task ? <TaskItem task={task} /> : null}
             </DragOverlay>
-          </Grid>
+            {/* </Grid> */}
+          </Box>
         </DndContext>
       </Container>
 
