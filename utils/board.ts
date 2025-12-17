@@ -15,10 +15,11 @@ export const OldInitializeBoard = (tasks: Task[]) => {
   return boardSections;
 };
 
-export const initializeBoard = (tasks: Task[]) => {
+export const initializeBoard = (tasks: Task[], columns: any) => {
   const boardSections = {};
 
-  tasks.forEach((task) => (boardSections[task?.columnName] = []));
+  // tasks.forEach((task) => (boardSections[task?.columnName] = []));
+  columns.forEach((column) => (boardSections[column?.columnName] = []));
   // console.log("dummy boardSections", boardSections);
 
   Object.keys(boardSections).forEach((boardSectionKey) => {
