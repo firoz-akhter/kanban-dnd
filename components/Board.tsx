@@ -312,6 +312,7 @@ const Board = () => {
                 />
                 {/* </Grid> */}
               </Box>
+              // minor changes
             ))}
             {/* <Grid item xs={3} key=""> */}
             <Box
