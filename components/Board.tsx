@@ -41,6 +41,7 @@ import {
   Typography,
 } from "@mui/material";
 import toast from "react-hot-toast";
+import Header from "./Header";
 
 const Board = () => {
   // const oldTasks = INITIAL_TASKS;
@@ -54,8 +55,11 @@ const Board = () => {
   const [newColumn, setNewColumn] = useState({ columnName: "" });
 
   // this is obj of columns with todos: [] in it boardSections = boardColumns
+  const [wholeBoardSections, setWholeBoardSections] =
+    useState<BoardSectionsType>({});
   const [boardSections, setBoardSections] = useState<BoardSectionsType>({});
-  console.log("boardSections,,", boardSections);
+  // console.log("boardSections,,", boardSections);
+  // console.log("wholeBoardSections", wholeBoardSections);
 
   // console.log("tasks...", tasks);
   // console.log(boardColumns);
@@ -95,6 +99,7 @@ const Board = () => {
 
       const initialBoardSections = initializeBoard(fetchedTasks, data.data);
       setBoardSections(initialBoardSections);
+      setWholeBoardSections(initialBoardSections);
     } catch (error) {
       console.error(error);
     }
@@ -159,6 +164,65 @@ const Board = () => {
     }
   };
 
+  const updateTask = async (
+    activeContainer,
+    overContainer,
+    activeIndex,
+    overIndex,
+    taskId
+  ) => {
+    if (activeContainer == overContainer) return;
+
+    const activeColumnId = boardColumns.find(
+      (boardColumn) => boardColumn?.columnName === activeContainer
+    )?._id;
+    const overColumnId = boardColumns.find(
+      (boardColumn) => boardColumn?.columnName === overContainer
+    )?._id;
+    console.log("activeColumnId", activeColumnId, activeContainer);
+    console.log("overColumnId", overColumnId, overContainer);
+
+    // here we will make the api call in order to update the task with taskId
+    // we will send taskId, oldColumnId, newColumnId
+
+    if (!activeColumnId || !overColumnId) {
+      toast.error("Column not found");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${baseUrl}/moveTask/${taskId}/${activeColumnId}/${overColumnId}/${overIndex}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to move task");
+      }
+
+      console.log("Task moved successfully:", result.data);
+      toast.success("Task moved successfully! 🎉");
+
+      // Refresh the board data to reflect changes
+      await fetchData();
+
+      return result.data;
+    } catch (error) {
+      console.error("Error moving task:", error);
+      toast.error(error.message || "Failed to move task");
+
+      // Optionally revert the UI change by fetching data again
+      await fetchData();
+    }
+  };
+
   const handleDragStart = ({ active }: DragStartEvent) => {
     console.log("handleDragStart", active);
     setActiveTaskId(active.id as string);
@@ -177,12 +241,6 @@ const Board = () => {
       over?.id as string
     );
 
-    console.log(
-      "active and over container handleDragOver",
-      activeContainer,
-      overContainer
-    );
-
     if (
       !activeContainer ||
       !overContainer ||
@@ -190,6 +248,22 @@ const Board = () => {
     ) {
       return;
     }
+
+    const activeItems = boardSections[activeContainer];
+    const overItems = boardSections[overContainer];
+
+    // Find the indexes for the items
+    const activeIndex = activeItems.findIndex((item) => item._id === active.id);
+    const overIndex = overItems.findIndex((item) => item._id === over?.id);
+
+    // console.log("active and over Index", activeIndex, overIndex);
+    updateTask(
+      activeContainer,
+      overContainer,
+      activeIndex,
+      overIndex + 1,
+      active?.id
+    );
 
     setBoardSections((boardSection) => {
       const activeItems = boardSection[activeContainer];
@@ -199,7 +273,7 @@ const Board = () => {
       const activeIndex = activeItems.findIndex(
         (item) => item._id === active.id
       );
-      const overIndex = overItems.findIndex((item) => item._id !== over?.id);
+      const overIndex = overItems.findIndex((item) => item._id === over?.id);
 
       return {
         ...boardSection,
@@ -231,6 +305,8 @@ const Board = () => {
       over?.id as string
     );
 
+    // console.log("active and over,,", active, over);
+
     console.log("active and over container", activeContainer, overContainer);
 
     if (
@@ -249,6 +325,7 @@ const Board = () => {
     );
 
     if (activeIndex !== overIndex) {
+      // console.log("indexes not equal", activeIndex, overIndex);
       setBoardSections((boardSection) => ({
         ...boardSection,
         [overContainer]: arrayMove(
@@ -272,9 +349,32 @@ const Board = () => {
   console.log("tasks", tasks);
   console.log("boardColumns", boardColumns);
 
+  const filterBoardBySearchText = (searchText: string) => {
+    console.log("inside filter", searchText);
+    if (searchText === "") {
+      console.log("empty..");
+      setBoardSections(wholeBoardSections);
+      return;
+    }
+
+    const filteredSections: any = {};
+    const lowerSearchText = searchText.toLowerCase();
+
+    Object.keys(wholeBoardSections).forEach((columnKey) => {
+      const filteredTasks = wholeBoardSections[columnKey].filter((task) =>
+        task.title.toLowerCase().includes(lowerSearchText)
+      );
+
+      filteredSections[columnKey] = filteredTasks;
+    });
+    setBoardSections(filteredSections);
+  };
+
   return (
     <>
-      <Container>
+      <Header filterBoardBySearchText={filterBoardBySearchText} />
+      <div className="absolute top-0 left-0 h-200 w-full bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-b-md -z-50 opacity-50 blur-3xl" />
+      <Box sx={{ overflowX: "auto", px: 3 }}>
         <DndContext
           sensors={sensors}
           collisionDetection={closestCorners}
@@ -282,18 +382,16 @@ const Board = () => {
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
-          {/* <Grid container spacing={4}> */}
           <Box
             sx={{
               display: "flex",
               gap: 2,
-              minHeight: "calc(100vh - 200px)",
+              minHeight: "calc(100vh - 175px)",
               pb: 2,
+              marginLeft: 10,
             }}
           >
-            {/* <div className="flex gap-8 justify-center"> */}
             {Object.keys(boardSections).map((boardSectionKey, idx) => (
-              // <Grid item xs={3} key={boardSectionKey}>
               <Box
                 key={boardSectionKey}
                 sx={{
@@ -310,11 +408,8 @@ const Board = () => {
                   // columnName={}
                   fetchData={fetchData}
                 />
-                {/* </Grid> */}
               </Box>
-              // minor changes
             ))}
-            {/* <Grid item xs={3} key=""> */}
             <Box
               sx={{
                 minWidth: 300,
@@ -324,7 +419,6 @@ const Board = () => {
               }}
             >
               <Box sx={{ backgroundColor: "#eee", padding: 2, marginRight: 2 }}>
-                {/* <Typography variant="h6" sx={{ mb: 2 }}> */}
                 <Button
                   onClick={() => setIsAddColumnOpen(true)}
                   variant="text"
@@ -338,18 +432,14 @@ const Board = () => {
                 >
                   Add New Task List
                 </Button>
-                {/* </Typography> */}
               </Box>
-              {/* </Grid> */}
             </Box>
-            {/* </div> */}
             <DragOverlay dropAnimation={dropAnimation}>
               {task ? <TaskItem task={task} /> : null}
             </DragOverlay>
-            {/* </Grid> */}
           </Box>
         </DndContext>
-      </Container>
+      </Box>
 
       {/* Add Task Popup */}
       <Dialog
@@ -363,7 +453,6 @@ const Board = () => {
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         >
-          {/* Task Title */}
           <TextField
             required
             autoFocus
