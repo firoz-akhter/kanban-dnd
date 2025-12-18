@@ -2,9 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { MagnifyingGlassIcon, UserCircleIcon } from "@heroicons/react/20/solid";
 import SearchIcon from "@mui/icons-material/Search";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Avatar from "react-avatar";
 import { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
@@ -96,7 +94,7 @@ function Header({ filterBoardBySearchText }) {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="focus:outline-none"
             >
-              <Avatar name="Frz" round size="50" color="#0055D1" />
+              <Avatar name="F" round size="50" color="#0055D1" />
             </button>
 
             {/* Dropdown Menu */}

@@ -100,8 +100,8 @@ const Board = () => {
       console.log("data,,,", data);
       setBoardColumns(data.data);
       // we will setTasks
-      const fetchedTasks = [];
-      data.data.forEach((column) => fetchedTasks.push(...column.todos));
+      const fetchedTasks: any = [];
+      data.data.forEach((column: any) => fetchedTasks.push(...column.todos));
       console.log("fetched tasks", fetchedTasks);
       setTasks(fetchedTasks);
 
@@ -177,11 +177,11 @@ const Board = () => {
   };
 
   const updateTask = async (
-    activeContainer,
-    overContainer,
-    activeIndex,
-    overIndex,
-    taskId
+    activeContainer: any,
+    overContainer: any,
+    activeIndex: any,
+    overIndex: any,
+    taskId: any
   ) => {
     if (activeContainer == overContainer) return;
 
