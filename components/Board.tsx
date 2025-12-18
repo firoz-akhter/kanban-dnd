@@ -42,11 +42,14 @@ import {
 } from "@mui/material";
 import toast from "react-hot-toast";
 import Header from "./Header";
+import { useRouter } from "next/navigation";
 
 const Board = () => {
   // const oldTasks = INITIAL_TASKS;
 
   // const oldInitialBoardSections = OldInitializeBoard(INITIAL_TASKS);
+
+  const router = useRouter();
 
   const [boardColumns, setBoardColumns] = useState([]);
   console.log("boardColumns,,", boardColumns);
@@ -65,12 +68,17 @@ const Board = () => {
   // console.log(boardColumns);
 
   const baseUrl = "http://localhost:4000/api";
+  const boardId = localStorage.getItem("boardId");
+  const token = localStorage.getItem("token");
+  // console.log("localStorage board id", typeof boardId);
   const getBoardColumns = async () => {
     try {
-      const response = await fetch(`${baseUrl}/getBoardColumns`, {
+      const response = await fetch(`${baseUrl}/getBoardColumns/${boardId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          // we will send token here
+          // token: `${token}`,
         },
       });
 
@@ -106,6 +114,9 @@ const Board = () => {
   };
 
   useEffect(() => {
+    if (!token) {
+      router.push("/login");
+    }
     fetchData();
   }, []);
 
@@ -125,7 +136,7 @@ const Board = () => {
       return;
     }
 
-    let boardId = "69317058536abc4e80038c55";
+    // let boardId = "69317058536abc4e80038c55";
 
     try {
       const response = await fetch(`${baseUrl}/addColumn/${boardId}`, {
