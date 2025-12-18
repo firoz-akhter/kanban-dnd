@@ -42,7 +42,7 @@ function Header({ filterBoardBySearchText }) {
   // };
 
   useEffect(() => {
-    console.log("text,,,", searchText);
+    // console.log("text,,,", searchText);
     filterBoardBySearchText(searchText);
   }, [searchText]);
 
