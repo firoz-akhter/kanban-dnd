@@ -151,6 +151,7 @@ const Board = () => {
 
       // ✅ Close dialog
       setIsAddColumnOpen(false);
+      setNewColumn({ columnName: "" });
 
       // ✅ Reset form
       // setNewTask(initialNewTask);
