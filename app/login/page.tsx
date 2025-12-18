@@ -25,14 +25,12 @@ const Login = () => {
       console.log("API Response:", data);
 
       if (response.ok && data.token) {
-        // Save token to localStorage
         localStorage.setItem("token", data.token);
         localStorage.setItem("boardId", data.boardId || "");
         console.log("Token saved to localStorage:", data.token);
 
         toast.success("Login successful! 🎉");
 
-        // Navigate to home/landing page
         router.push("/");
         console.log("Navigating to home page...");
       } else {
