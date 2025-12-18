@@ -14,13 +14,15 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const baseUrl = "http://localhost:4000/api";
+
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       // Replace with your actual API endpoint
-      const response = await fetch("http://localhost:4000/api/auth/register", {
+      const response = await fetch(`${baseUrl}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
