@@ -1,50 +1,62 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { MagnifyingGlassIcon, UserCircleIcon } from "@heroicons/react/20/solid";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Avatar from "react-avatar";
-// import { useBoardStore } from "@/store/BoardStore";
-import { useEffect, useState } from "react";
-// import fetchSuggestion from "@/lib/fetchSuggestion";
+import { useEffect, useState, useRef } from "react";
+import toast from "react-hot-toast";
 
 function Header({ filterBoardBySearchText }) {
-  // const [board, searchString, setSearchString] = useBoardStore((state) => [
-  //   state.board,
-  //   state.searchString,
-  //   state.setSearchString,
-  // ]);
-
+  const router = useRouter();
   const [searchText, setSearchText] = useState("");
-
   const [loading, setLoading] = useState<boolean>(false);
   const [suggestion, setSuggestion] = useState<any[]>([]);
-
-  // useEffect(() => {
-  //   if (board.columns.size === 0) return;
-  //   setLoading(true);
-  //   const fetchSuggestionFunc = async () => {
-  //     const suggestion = await fetchSuggestion(board);
-  //     setSuggestion(suggestion);
-  //     setLoading(false);
-  //   };
-
-  //   setTimeout(() => {
-  //     fetchSuggestionFunc();
-  //   }, 3000);
-  // }, [board]);
-
-  // const handleSearch = (e: any) => {
-  //   setSearchText(e.target.value);
-  //   console.log("text,,", searchText);
-  //   filterBoardBySearchText(searchText);
-  // };
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // console.log("text,,,", searchText);
     filterBoardBySearchText(searchText);
   }, [searchText]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    try {
+      // Remove token from localStorage
+      localStorage.removeItem("token");
+      localStorage.removeItem("boardId");
+
+      // Show success message
+      toast.success("Logged out successfully! 👋");
+
+      // Close dropdown
+      setIsDropdownOpen(false);
+
+      // Redirect to login page
+      router.push("/login");
+    } catch (error) {
+      console.error("Error during logout:", error);
+      toast.error("Failed to logout. Please try again.");
+    }
+  };
 
   return (
     <header className="sticky z-20 top-0 mb-20 left-0">
@@ -77,7 +89,33 @@ function Header({ filterBoardBySearchText }) {
               Search
             </button>
           </form>
-          <Avatar name="Frz" round size="50" color="#0055D1" />
+
+          {/* Avatar with Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="focus:outline-none"
+            >
+              <Avatar name="Frz" round size="50" color="#0055D1" />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                <div className="px-4 py-2 border-b border-gray-200">
+                  <p className="text-sm font-semibold text-gray-700">Frz</p>
+                  <p className="text-xs text-gray-500">user@example.com</p>
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition duration-150"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
