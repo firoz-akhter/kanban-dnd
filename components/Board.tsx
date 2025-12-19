@@ -71,8 +71,12 @@ const Board = () => {
   // console.log(boardColumns);
 
   const baseUrl = "http://localhost:4000/api";
-  const boardId = localStorage.getItem("boardId");
-  const token = localStorage.getItem("token");
+  let boardId = "";
+  let token = "";
+  useEffect(() => {
+    boardId = localStorage.getItem("boardId") || "";
+    token = localStorage.getItem("token") || "";
+  }, []);
   // console.log("localStorage board id", typeof boardId);
   const getBoardColumns = async () => {
     try {
