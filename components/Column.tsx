@@ -69,7 +69,7 @@ BoardSectionProps) => {
   console.log("columnId,,.", columnId);
 
   const [isUpdateTaskOpen, setIsUpdateTaskOpen] = useState(false);
-  const [updateTask, setUpdateTask] = useState({
+  const [updateTask, setUpdateTask] = useState<Partial<Task>>({
     title: "",
     status: "",
     description: "",
@@ -139,7 +139,7 @@ BoardSectionProps) => {
   };
 
   const handleUpdateTask = async () => {
-    if (!updateTask.title.trim()) {
+    if (!updateTask?.title?.trim()) {
       toast.error("Task title is required");
       return;
     }
@@ -148,16 +148,16 @@ BoardSectionProps) => {
 
     try {
       const payload = {
-        title: updateTask.title,
-        description: updateTask.description,
-        priority: updateTask.priority,
-        dueDate: updateTask.dueDate,
-        status: updateTask.status,
+        title: updateTask?.title,
+        description: updateTask?.description,
+        priority: updateTask?.priority,
+        dueDate: updateTask?.dueDate,
+        status: updateTask?.status,
         // newColumnName: task.columnName, // ✅ IMPORTANT
       };
 
       const response = await fetch(
-        `${baseUrl}/updateTask/${updateTask._id}/${updateTask.columnId}`,
+        `${baseUrl}/updateTask/${updateTask?._id}/${updateTask?.columnId}`,
         {
           method: "PATCH",
           headers: {
@@ -183,6 +183,8 @@ BoardSectionProps) => {
   };
 
   const handleDeleteColumn = async () => {
+    const toastId = toast.loading("Updating task...");
+
     try {
       let boardId = "69317058536abc4e80038c55";
       const response = await fetch(
@@ -208,7 +210,7 @@ BoardSectionProps) => {
 
       // Refresh board data
       fetchData(); // or refetchBoard()
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting column:", error);
       toast.error(error.message || "Error updating task", { id: toastId });
     }
@@ -370,7 +372,7 @@ BoardSectionProps) => {
             autoFocus
             fullWidth
             label="Task Title"
-            value={updateTask.title}
+            value={updateTask?.title}
             onChange={(e) =>
               setUpdateTask((prev) => ({ ...prev, title: e.target.value }))
             }

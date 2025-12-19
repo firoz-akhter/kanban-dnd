@@ -25,8 +25,8 @@ import { useState } from "react";
 type TaskItemProps = {
   task: Task;
   fetchData: () => void;
-  setIsUpdateTaskOpen: boolean;
-  setUpdateTask: () => void;
+  setIsUpdateTaskOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setUpdateTask: React.Dispatch<React.SetStateAction<Partial<Task>>>;
 };
 
 const TaskItem = ({
