@@ -7,7 +7,11 @@ import Avatar from "react-avatar";
 import { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
 
-function Header({ filterBoardBySearchText }) {
+function Header({
+  filterBoardBySearchText,
+}: {
+  filterBoardBySearchText: (searchText: string) => void;
+}) {
   const router = useRouter();
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState<boolean>(false);

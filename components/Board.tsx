@@ -19,8 +19,11 @@ import {
   defaultDropAnimation,
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
-import { INITIAL_TASKS } from "../data/index";
-import { BoardSections as BoardSectionsType } from "../types/index";
+// import { INITIAL_TASKS } from "../data/index";
+import {
+  BoardColumn,
+  BoardSections as BoardSectionsType,
+} from "../types/index";
 import { getTaskById } from "../utils/tasks";
 import {
   findBoardSectionContainer,
@@ -51,7 +54,7 @@ const Board = () => {
 
   const router = useRouter();
 
-  const [boardColumns, setBoardColumns] = useState([]);
+  const [boardColumns, setBoardColumns] = useState<BoardColumn[]>([]);
   console.log("boardColumns,,", boardColumns);
   const [tasks, setTasks] = useState([]);
   const [isAddColumnOpen, setIsAddColumnOpen] = useState(false);
@@ -226,7 +229,7 @@ const Board = () => {
       await fetchData();
 
       return result.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error moving task:", error);
       toast.error(error.message || "Failed to move task");
 
@@ -447,7 +450,7 @@ const Board = () => {
               </Box>
             </Box>
             <DragOverlay dropAnimation={dropAnimation}>
-              {task ? <TaskItem task={task} /> : null}
+              {task ? <TaskItem task={task} fetchData={fetchData} /> : null}
             </DragOverlay>
           </Box>
         </DndContext>
