@@ -46,6 +46,7 @@ import {
 import toast from "react-hot-toast";
 import Header from "./Header";
 import { useRouter } from "next/navigation";
+import Footer from "./Footer";
 
 const Board = () => {
   // const oldTasks = INITIAL_TASKS;
@@ -416,7 +417,7 @@ const Board = () => {
             sx={{
               display: "flex",
               gap: 2,
-              minHeight: "calc(100vh - 175px)",
+              minHeight: "calc(100vh - 215px)",
               pb: 2,
               marginLeft: 10,
             }}
@@ -487,6 +488,7 @@ const Board = () => {
             </DragOverlay>
           </Box>
         </DndContext>
+        <Footer />
       </Box>
 
       {/* Add Task Popup */}
