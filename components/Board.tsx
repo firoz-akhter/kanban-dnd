@@ -449,8 +449,26 @@ const Board = () => {
                 </Button>
               </Box>
             </Box>
-            <DragOverlay dropAnimation={dropAnimation}>
+            {/* <DragOverlay dropAnimation={dropAnimation}>
               {task ? <TaskItem task={task} fetchData={fetchData} /> : null}
+            </DragOverlay> */}
+            <DragOverlay dropAnimation={dropAnimation}>
+              {task ? (
+                <div className="bg-white p-3 rounded-md shadow-lg opacity-90 cursor-grabbing">
+                  <Typography variant="body1" fontWeight="bold">
+                    {task.title}
+                  </Typography>
+                  {task.description && (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      className="mt-1"
+                    >
+                      {task.description}
+                    </Typography>
+                  )}
+                </div>
+              ) : null}
             </DragOverlay>
           </Box>
         </DndContext>
