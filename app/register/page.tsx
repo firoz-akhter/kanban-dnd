@@ -14,7 +14,8 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const baseUrl = "http://localhost:4000/api";
+  // const baseUrl = "http://localhost:4000/api";
+  const baseUrl = "https://kanban-dnd-backend.vercel.app/api";
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

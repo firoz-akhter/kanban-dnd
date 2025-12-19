@@ -35,7 +35,8 @@ const TaskItem = ({
   setIsUpdateTaskOpen,
   setUpdateTask,
 }: TaskItemProps) => {
-  const baseUrl = "http://localhost:4000/api";
+  // const baseUrl = "http://localhost:4000/api";
+  const baseUrl = "https://kanban-dnd-backend.vercel.app/api";
   const handleDeleteTask = async (e: any, taskId: string, columnId: string) => {
     // we will add popup for final confirmation before delete
     e.stopPropagation();

@@ -70,7 +70,8 @@ const Board = () => {
   // console.log("tasks...", tasks);
   // console.log(boardColumns);
 
-  const baseUrl = "http://localhost:4000/api";
+  // const baseUrl = "http://localhost:4000/api";
+  const baseUrl = "https://kanban-dnd-backend.vercel.app/api";
   // let boardId = localStorage.getItem("boardId") || "";
   // let token = localStorage.getItem("token") || "";
 
