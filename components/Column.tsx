@@ -205,14 +205,14 @@ BoardSectionProps) => {
       }
 
       console.log("Column deleted:", data);
-      toast.success("List Deleted Successfully ✅");
+      toast.success("List Deleted Successfully ✅", { id: toastId });
       setIsDeleteColumn(false);
 
       // Refresh board data
       fetchData(); // or refetchBoard()
     } catch (error: any) {
       console.error("Error deleting column:", error);
-      toast.error(error.message || "Error updating task", { id: toastId });
+      toast.error(error.message || "Error deleting column", { id: toastId });
     }
   };
 
