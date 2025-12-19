@@ -10,6 +10,7 @@ export type Task = {
   columnId: string;
   priority: string;
   dueDate: string;
+  columnName: string;
 };
 
 export type BoardSections = {
