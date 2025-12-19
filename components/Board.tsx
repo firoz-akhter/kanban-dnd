@@ -71,13 +71,31 @@ const Board = () => {
   // console.log(boardColumns);
 
   const baseUrl = "http://localhost:4000/api";
-  let boardId = "";
-  let token = "";
+  // let boardId = localStorage.getItem("boardId") || "";
+  // let token = localStorage.getItem("token") || "";
+
+  const [boardId, setBoardId] = useState("");
+  const [token, setToken] = useState("");
+
   useEffect(() => {
-    boardId = localStorage.getItem("boardId") || "";
-    token = localStorage.getItem("token") || "";
+    const storedBoardId = localStorage.getItem("boardId") || "";
+    const storedToken = localStorage.getItem("token") || "";
+
+    setBoardId(storedBoardId);
+    setToken(storedToken);
+    console.log("storedToken", storedToken);
+
+    if (!storedToken) {
+      router.push("/login");
+    }
   }, []);
-  // console.log("localStorage board id", typeof boardId);
+
+  useEffect(() => {
+    if (!boardId || boardId === "") return;
+
+    fetchData();
+  }, [boardId]);
+
   const getBoardColumns = async () => {
     try {
       const response = await fetch(`${baseUrl}/getBoardColumns/${boardId}`, {
@@ -120,15 +138,7 @@ const Board = () => {
     }
   };
 
-  useEffect(() => {
-    if (!token) {
-      router.push("/login");
-    }
-    fetchData();
-  }, []);
-
   const [activeTaskId, setActiveTaskId] = useState<null | string>(null);
-  // console.log(activeTaskId)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -152,7 +162,7 @@ const Board = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          columnName: newColumn.columnName,
+          columnName: newColumn?.columnName || "",
         }),
       });
 
