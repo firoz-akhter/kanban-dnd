@@ -1,4 +1,4 @@
-import { BoardSections, Status, Task } from "../types";
+import { BoardColumn, BoardSections, Status, Task } from "../types";
 import { BOARD_SECTIONS } from "../constants";
 import { getTasksByStatus } from "./tasks";
 
@@ -15,8 +15,8 @@ export const OldInitializeBoard = (tasks: Task[]) => {
   return boardSections;
 };
 
-export const initializeBoard = (tasks: Task[], columns: any) => {
-  const boardSections = {};
+export const initializeBoard = (tasks: Task[], columns: BoardColumn[]) => {
+  const boardSections: { [key: string]: Task[] } = {};
 
   // tasks.forEach((task) => (boardSections[task?.columnName] = []));
   columns.forEach((column) => (boardSections[column?.columnName] = []));
