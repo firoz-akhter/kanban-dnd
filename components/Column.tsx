@@ -85,7 +85,8 @@ BoardSectionProps) => {
   console.log("column props", id, title, tasks);
   console.log("id from column", id);
 
-  const baseUrl = "http://localhost:4000/api";
+  // const baseUrl = "http://localhost:4000/api";
+  const baseUrl = "https://kanban-dnd-backend.vercel.app/api";
 
   const handleAddTask = async () => {
     // console.log("newTask", newTask);
