@@ -83,7 +83,6 @@ const TaskItem = ({
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation();
-                console.log("Edit task", task);
                 setUpdateTask(task);
                 setIsUpdateTaskOpen(true);
               }}

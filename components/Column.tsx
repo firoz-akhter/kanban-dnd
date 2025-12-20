@@ -65,8 +65,8 @@ BoardSectionProps) => {
 
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
   const [newTask, setNewTask] = useState(initialNewTask);
-  console.log("newTask", newTask);
-  console.log("columnId,,.", columnId);
+  // console.log("newTask", newTask);
+  // console.log("columnId,,.", columnId);
 
   const [isUpdateTaskOpen, setIsUpdateTaskOpen] = useState(false);
   const [updateTask, setUpdateTask] = useState<Partial<Task>>({
@@ -82,8 +82,8 @@ BoardSectionProps) => {
 
   // console.log("updateTask", updateTask);
 
-  console.log("column props", id, title, tasks);
-  console.log("id from column", id);
+  // console.log("column props", id, title, tasks);
+  // console.log("id from column", id);
 
   // const baseUrl = "http://localhost:4000/api";
   const baseUrl = "https://kanban-dnd-backend.vercel.app/api";
@@ -119,20 +119,14 @@ BoardSectionProps) => {
         throw new Error(result.message || "Failed to create task");
       }
 
-      console.log("Task created:", result.data);
-
       // add toaster
       toast.success("Task created successfully🎉..");
 
-      // ✅ Close dialog
       setIsAddTaskOpen(false);
 
-      // ✅ Reset form
       setNewTask(initialNewTask);
 
       fetchData();
-
-      // 🔥 Optional: refresh column / dispatch redux
     } catch (error: any) {
       console.error(error);
       alert(error.message);
@@ -205,7 +199,7 @@ BoardSectionProps) => {
         return;
       }
 
-      console.log("Column deleted:", data);
+      // console.log("Column deleted:", data);
       toast.success("List Deleted Successfully ✅", { id: toastId });
       setIsDeleteColumn(false);
 

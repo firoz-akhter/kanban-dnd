@@ -25,17 +25,14 @@ const Login = () => {
       });
 
       const data = await response.json();
-      console.log("API Response:", data);
 
       if (response.ok && data.token) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("boardId", data.boardId || "");
-        console.log("Token saved to localStorage:", data.token);
 
         toast.success("Login successful! 🎉");
 
         router.push("/");
-        console.log("Navigating to home page...");
       } else {
         console.log("Login failed:", data.message);
         toast.error(data.message || "Login failed. Please try again.");

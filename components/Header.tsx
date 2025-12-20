@@ -75,7 +75,6 @@ function Header({
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              console.log("searchText", searchText);
             }}
             className="flex items-center space-x-5 bg-white rounded-md p-2 shadow-md flex-1 md:flex-initial"
           >

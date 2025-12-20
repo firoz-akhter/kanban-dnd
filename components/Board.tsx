@@ -68,9 +68,6 @@ const Board = () => {
   // console.log("boardSections,,", boardSections);
   // console.log("wholeBoardSections", wholeBoardSections);
 
-  // console.log("tasks...", tasks);
-  // console.log(boardColumns);
-
   // const baseUrl = "http://localhost:4000/api";
   const baseUrl = "https://kanban-dnd-backend.vercel.app/api";
   // let boardId = localStorage.getItem("boardId") || "";
@@ -85,7 +82,6 @@ const Board = () => {
 
     setBoardId(storedBoardId);
     setToken(storedToken);
-    console.log("storedToken", storedToken);
 
     if (!storedToken) {
       router.push("/login");
@@ -124,12 +120,10 @@ const Board = () => {
   const fetchData = async () => {
     try {
       const data = await getBoardColumns();
-      console.log("data,,,", data);
       setBoardColumns(data.data);
       // we will setTasks
       const fetchedTasks: any = [];
       data.data.forEach((column: any) => fetchedTasks.push(...column.todos));
-      console.log("fetched tasks", fetchedTasks);
       setTasks(fetchedTasks);
 
       const initialBoardSections = initializeBoard(fetchedTasks, data.data);
@@ -174,21 +168,16 @@ const Board = () => {
         throw new Error(result.message || "Failed to add new list");
       }
 
-      console.log("List Added:", result.data);
+      // console.log("List Added:", result.data);
 
-      // add toaster
       toast.success("List created successfully🎉..");
 
-      // ✅ Close dialog
       setIsAddColumnOpen(false);
       setNewColumn({ columnName: "" });
 
-      // ✅ Reset form
       // setNewTask(initialNewTask);
 
       fetchData();
-
-      // 🔥 Optional: refresh column / dispatch redux
     } catch (error: any) {
       console.error(error);
       alert(error.message);
@@ -210,8 +199,8 @@ const Board = () => {
     const overColumnId = boardColumns.find(
       (boardColumn) => boardColumn?.columnName === overContainer
     )?._id;
-    console.log("activeColumnId", activeColumnId, activeContainer);
-    console.log("overColumnId", overColumnId, overContainer);
+    // console.log("activeColumnId", activeColumnId, activeContainer);
+    // console.log("overColumnId", overColumnId, overContainer);
 
     // here we will make the api call in order to update the task with taskId
     // we will send taskId, oldColumnId, newColumnId
@@ -238,7 +227,6 @@ const Board = () => {
         throw new Error(result.message || "Failed to move task");
       }
 
-      console.log("Task moved successfully:", result.data);
       toast.success("Task moved successfully! 🎉");
 
       // Refresh the board data to reflect changes
@@ -255,14 +243,13 @@ const Board = () => {
   };
 
   const handleDragStart = ({ active }: DragStartEvent) => {
-    console.log("handleDragStart", active);
     setActiveTaskId(active.id as string);
   };
 
   const handleDragOver = ({ active, over }: DragOverEvent) => {
     // Find the containers
     // return;
-    console.log("handleDragOver", active, over);
+    // console.log("handleDragOver", active, over);
     const activeContainer = findBoardSectionContainer(
       boardSections,
       active.id as string
@@ -283,7 +270,6 @@ const Board = () => {
     const activeItems = boardSections[activeContainer];
     const overItems = boardSections[overContainer];
 
-    // Find the indexes for the items
     const activeIndex = activeItems.findIndex((item) => item._id === active.id);
     const overIndex = overItems.findIndex((item) => item._id === over?.id);
 
@@ -338,8 +324,6 @@ const Board = () => {
 
     // console.log("active and over,,", active, over);
 
-    console.log("active and over container", activeContainer, overContainer);
-
     if (
       !activeContainer ||
       !overContainer ||
@@ -377,13 +361,10 @@ const Board = () => {
   const task = activeTaskId ? getTaskById(tasks, activeTaskId) : null;
   // const task = activeTaskId ? getTaskById(boardColumns, activeTaskId) : null;
 
-  console.log("tasks", tasks);
-  console.log("boardColumns", boardColumns);
-
   const filterBoardBySearchText = (searchText: string) => {
-    console.log("inside filter", searchText);
+    // console.log("inside filter", searchText);
     if (searchText === "") {
-      console.log("empty..");
+      // console.log("empty..");
       setBoardSections(wholeBoardSections);
       return;
     }
