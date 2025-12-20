@@ -22,7 +22,6 @@ const Register = () => {
     setLoading(true);
 
     try {
-      // Replace with your actual API endpoint
       const response = await fetch(`${baseUrl}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
